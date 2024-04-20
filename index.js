@@ -35,12 +35,36 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/users/:id' , async(req,res)=>{
+            const id = req.params.id;
+            const query = {_id : new ObjectId(id)};
+            const result = await database.findOne(query);
+            res.send(result);
+        })
+
         app.post('/users', async (req, res) => {
             const user = req.body;
             console.log("new user details : ", user);
             const result = await database.insertOne(user);
             res.send(result);
             console.log(`a new user added . ID : ${result.insertedId}`);
+        })
+
+        app.put('/users/:id' , async(req,res) =>{
+            const id = req.params.id;
+            const user = req.body;
+            const filter = {_id : new ObjectId(id)};
+            const options = {upsert : true};
+            const updateUser = {
+                $set:{
+                    name : user.name,
+                    email : user.email
+                }
+            }
+
+            const result = await database.updateOne(filter,updateUser,options);
+            res.send(result);
+
         })
 
         app.delete('/users/:id' ,async(req,res) =>{
